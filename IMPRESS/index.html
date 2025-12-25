@@ -1,0 +1,124 @@
+<!-- 
+  
+
+  SASKIA LAMPE - 2025 - IMPRESS 3D MODELING
+
+
+
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>3D Membrane (Webcam + Three.js)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="./styles.css" />
+
+  <!-- three importmap stays in HTML -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <header>
+    <span class="pill">3D Membrane</span>
+    <span class="kpi">Status: <span id="status" class="status-ok">idle</span></span>
+    <span class="kpi" style="margin-left:auto;">FPS: <span id="fps">0</span></span>
+  </header>
+
+  <main>
+    <!-- LEFT -->
+    <section class="stage">
+      <div class="toolbar">
+        <label><input id="driveCamera" type="checkbox" checked> Drive from camera</label>
+        <label><input id="showCamera" type="checkbox" checked> Show camera panel</label>
+        <span class="spacer"></span>
+        <button id="btnResetView" class="ghost">Reset view</button>
+        <button id="btnStl" class="primary">Export STL</button>
+      </div>
+
+      <div class="cameraWrap" id="cameraWrap">
+        <div class="cameraBar">
+          <button id="btnStart" class="soft">Start webcam</button>
+          <button id="btnCalib" class="soft" disabled>Calibrate grid</button>
+          <button id="btnBaseline" class="soft" disabled>Set baseline</button>
+          <label><input id="flipY" type="checkbox"> Flip Y</label>
+          <label><input id="showMask" type="checkbox"> Show mask</label>
+          <label><input id="showBoxes" type="checkbox"> Show detections</label>
+          <label><input id="rawAreaMode" type="checkbox"> Raw area</label>
+          <span class="hint">Calibrate: click top left, then bottom right of the 8×5 area.</span>
+        </div>
+
+        <div class="cameraView" id="cameraView">
+          <canvas id="cam"></canvas>
+          <video id="video" playsinline autoplay muted></video>
+        </div>
+      </div>
+
+      <div class="viewport">
+        <div id="mount"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <section class="panel">
+      <details class="calib" id="calibDetails">
+        <summary>Calibration</summary>
+        <div class="controls">
+          <label>Hue min <input id="hMin" type="range" min="0" max="360" value="70"></label>
+          <label>Hue max <input id="hMax" type="range" min="0" max="360" value="170"></label>
+          <label>Sat min <input id="sMin" type="range" min="0" max="100" value="35"></label>
+          <label>Val min <input id="vMin" type="range" min="0" max="100" value="25"></label>
+          <label>Min area <input id="minArea" type="range" min="5" max="2000" value="80"></label>
+          <label>Proc width <input id="procW" type="range" min="160" max="640" step="40" value="320"></label>
+
+          <label>Sensitivity
+            <input id="sens" type="range" min="10" max="300" step="1" value="150">
+          </label>
+          <span class="kpi" id="sensVal">1.50×</span>
+
+          <span class="hint"></span>
+        </div>
+      </details>
+
+      <div class="controls">
+        <label>EMA <input id="ema" type="range" min="0" max="0.95" step="0.05" value="0.7"></label>
+        <label>Gain <input id="gain" type="range" min="0" max="200" step="1" value="80"></label>
+        <span class="kpi" id="gainVal">0.80</span>
+        <label>Smoothness σ× <input id="sigma" type="range" min="20" max="200" step="1" value="90"></label>
+        <span class="kpi" id="sigmaVal">0.90× cell</span>
+        <label><input id="pause" type="checkbox"> Pause surface</label>
+        <button id="btnClear" class="ghost">Clear surface</button>
+      </div>
+
+      <div class="controls">
+        <div class="seg" id="modeSeg">
+          <input type="radio" name="mode" id="modeAdd" value="add" checked><label for="modeAdd">Add</label>
+          <input type="radio" name="mode" id="modeSub" value="sub"><label for="modeSub">Subtract</label>
+          <input type="radio" name="mode" id="modeFree" value="free"><label for="modeFree">Freeform</label>
+        </div>
+        <label>Strength <input id="brushStrength" type="range" min="0.01" max="1" step="0.01" value="0.15"></label>
+        <label>Brush size <input id="brushSize" type="range" min="1" max="4" step="1" value="1"></label>
+        <span class="kpi hint" id="paintTargetHint">Painting: camera offset</span>
+        <button id="btnClearManual" class="ghost">Clear Manual</button>
+        <button id="btnClearBias" class="ghost">Clear Camera Offset</button>
+      </div>
+
+      <div class="padwrap">
+        <div style="margin-bottom:8px;">Manual Drive</div>
+        <canvas id="pad" class="pad" width="480" height="300" title="Click/drag to paint"></canvas>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
